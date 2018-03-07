@@ -20,6 +20,8 @@ if sys.version_info[0] == 3:
 else:
     from urllib import quote
 
+def rfind_2nd(string, substring):
+	return string.rfind(substring, 0, string.rfind(substring)-1)
 
 class ES_Exception(Exception):
     """Exception capturing status_code from Client Request"""
@@ -183,9 +185,12 @@ def lambda_handler(event, context):
             # ignore .kibana index
             continue
 
-        idx_name = '-'.join(word for word in index["index"].split("-")[:-1])
-        idx_date = index["index"].split("-")[-1]
-
+        idx_name = '-'.join(word for word in index["index"].split("-")[:-3])
+        #idx_date = index["index"].split("-")[-1]
+        pos = rfind_2nd(index["index"], "-")
+        idx_date = index["index"][pos-4:]
+        #print("ZZindex: %s" % idx_date)
+        
         if idx_name in es.cfg["index"] or "all" in es.cfg["index"]:
 
             if idx_date <= earliest_to_keep.strftime(es.cfg["index_format"]):
